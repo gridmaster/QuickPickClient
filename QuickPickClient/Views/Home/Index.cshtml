@@ -1,0 +1,87 @@
+﻿@{
+    ViewBag.Title = "Welcome!";
+}
+
+@Scripts.Render("~/bundles/jquery")
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $('#btnGetQuickPicks').click(function (e) {
+            var max = $('#MaxNumbers :selected').text();
+            var picks = $('#Picks :selected').text();
+            var pbmax = $('#MaxPB :selected').text();
+            var tix = $('#Tickets :selected').text();
+            $('#id_div_text').val("");
+
+            $.ajax({
+                type: 'GET',
+                dataType: 'json',
+                url: "http://localhost:45668/QuickPicks?max=" + max + "&picks=" + picks + "&pbmax=" + pbmax + "&tix=" + tix + "", // "http://rest-service.guides.spring.io/greeting", // "
+                success: function (data) {
+                    var returnedData = JSON.parse(data);
+                    $.each(returnedData, function (i, item) {
+                        var num = i + 1;
+                        var content = '<span>Ticket # ' + num + ': ' + item.numbers;
+                        if (item.pBall === null) {
+                            content = content + '<br /></span>';
+                        }
+                        else {
+                            content = content + ' - pb: ' + item.pBall + '<br /></span>';
+                        }
+                        $('#id_div_text').append(content);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    alert(status);
+                }
+            })
+        });
+})
+</script>
+
+@section featured {
+    <section class="featured">
+        <div class="content-wrapper">
+            <hgroup class="title">
+                <h1>@ViewBag.Title.</h1>
+                <h2>@ViewBag.Message</h2>
+            </hgroup>
+            <p>
+            Enter the Lottery parameters for the Quicker Picker
+            </p>
+        </div>
+    </section>
+}
+@*<form method="post" id="FormPost" action="/Home/About">*@
+<h3>We suggest the following:</h3>
+<p>This widget uses javascript to transform this:</p>
+<table border="0">
+	<tr>
+		<td>How many numbers to pick from?</td>
+		<td>@Html.DropDownList("MaxNumbers")</td>
+	</tr>
+	<tr>
+		<td>Now many picks per ticket?</td>
+		<td>@Html.DropDownList("Picks")</td>
+	</tr>
+	<tr>
+		<td>If PowerBall, how many to pick from?</td>
+		<td>@Html.DropDownList("MaxPB")</td>
+	</tr>
+	<tr>
+		<td>Number of tickets?</td>
+		<td>@Html.DropDownList("Tickets")</td>
+	</tr>
+    <tr>
+        <td>
+            <input type="submit" id="btnGetQuickPicks" value="Get Quick Picks" />
+        </td>
+    </tr>
+</table>
+
+        <div>
+            <p class="greeting-content">The content is </p>
+            <div id="id_div_text"></div>
+        </div>
+@*    </form>*@
